@@ -28,6 +28,8 @@ final class CollectionViewLayout : UICollectionViewLayout
         }
     }
     
+    private(set) var isReordering : Bool = false
+    
     private func applyAppearance()
     {
         guard self.collectionView != nil else {
@@ -109,7 +111,7 @@ final class CollectionViewLayout : UICollectionViewLayout
     // MARK: Private Properties
     //
     
-    var layout : AnyListLayout
+    private(set) var layout : AnyListLayout
     
     private var previousLayout : AnyListLayout
     private var changesDuringCurrentUpdate : UpdateItems
@@ -190,22 +192,49 @@ final class CollectionViewLayout : UICollectionViewLayout
         self.neededLayoutType.merge(with: context)
     }
     
+    override func invalidationContext(
+        forInteractivelyMovingItems targetIndexPaths: [IndexPath],
+        withTargetPosition targetPosition: CGPoint,
+        previousIndexPaths: [IndexPath],
+        previousPosition: CGPoint
+    ) -> UICollectionViewLayoutInvalidationContext
+    {
+        self.isReordering = true
+        
+        print("invalidationContext(forInteractivelyMovingItems: ...")
+        
+        let context = super.invalidationContext(
+            forInteractivelyMovingItems: targetIndexPaths,
+            withTargetPosition: targetPosition,
+            previousIndexPaths: previousIndexPaths,
+            previousPosition: previousPosition
+        ) as! InvalidationContext
+        
+        return context
+    }
+    
     override func invalidationContextForEndingInteractiveMovementOfItems(
         toFinalIndexPaths indexPaths: [IndexPath],
         previousIndexPaths: [IndexPath],
         movementCancelled: Bool
     ) -> UICollectionViewLayoutInvalidationContext
     {
+        isReordering = false
+        
         listablePrecondition(movementCancelled == false, "Cancelling moves is currently not supported.")
+        
+        print("invalidationContextForEndingInteractiveMovementOfItems")
         
         self.layout.content.reindexLiveIndexPaths()
         self.layout.content.reindexDelegateProvidedIndexPaths()
-                                
-        return super.invalidationContextForEndingInteractiveMovementOfItems(
+        
+        let context = super.invalidationContextForEndingInteractiveMovementOfItems(
             toFinalIndexPaths: indexPaths,
             previousIndexPaths: previousIndexPaths,
             movementCancelled: movementCancelled
-        )
+        ) as! InvalidationContext
+                                
+        return context
     }
     
     override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool
@@ -293,7 +322,9 @@ final class CollectionViewLayout : UICollectionViewLayout
         
         self.performLayoutUpdate()
         
-        self.delegate.listViewLayoutDidLayoutContents()
+        if self.isReordering == false {
+            self.delegate.listViewLayoutDidLayoutContents()
+        }
     }
     
     override func prepare(forCollectionViewUpdates updateItems: [UICollectionViewUpdateItem])

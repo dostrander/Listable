@@ -199,9 +199,9 @@ extension ListView
             
             return reordering.destination(
                 from: from,
-                fromSection: fromSection.model,
+                fromSection: fromSection,
                 to: to,
-                toSection: toSection.model
+                toSection: toSection
             )
         }
         

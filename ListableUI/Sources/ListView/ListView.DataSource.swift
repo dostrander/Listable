@@ -92,6 +92,8 @@ internal extension ListView
             moveItemAt from: IndexPath,
             to: IndexPath
         ) {
+            print("Moving from \(from) to \(to)")
+            
             self.storage.moveItem(from: from, to: to)
             
             let item = self.presentationState.item(at: to)

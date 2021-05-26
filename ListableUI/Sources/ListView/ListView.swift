@@ -822,6 +822,12 @@ public final class ListView : UIView, KeyboardObserverDelegate
     
     internal func setPresentationStateItemPositions()
     {
+        /// During reordering; our index paths will not match the index paths of the collection view;
+        /// our index paths are not updated until the move is committed.
+        if self.collectionViewLayout.isReordering {
+            return
+        }
+        
         self.storage.presentationState.forEachItem { indexPath, item in
             item.itemPosition = self.collectionViewLayout.positionForItem(at: indexPath)
         }
