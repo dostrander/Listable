@@ -11,7 +11,9 @@ internal extension ListView
     final class DataSource : NSObject, UICollectionViewDataSource
     {
         unowned var presentationState : PresentationState!
+        unowned var storage : ListView.Storage!
         unowned var liveCells : LiveCells!
+        
         var environment : ListEnvironment!
 
         func numberOfSections(in collectionView: UICollectionView) -> Int
@@ -75,7 +77,10 @@ internal extension ListView
             return container
         }
         
-        func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool
+        func collectionView(
+            _ collectionView: UICollectionView,
+            canMoveItemAt indexPath: IndexPath
+        ) -> Bool
         {
             let item = self.presentationState.item(at: indexPath)
             
@@ -84,18 +89,22 @@ internal extension ListView
         
         func collectionView(
             _ collectionView: UICollectionView,
-            moveItemAt sourceIndexPath: IndexPath,
-            to destinationIndexPath: IndexPath
-            )
-        {
-            let item = self.presentationState.item(at: destinationIndexPath)
+            moveItemAt from: IndexPath,
+            to: IndexPath
+        ) {
+            self.storage.moveItem(from: from, to: to)
+            
+            let item = self.presentationState.item(at: to)
                         
-            item.moved(with: Reordering.Result(
-                fromSection: self.presentationState.sections[sourceIndexPath.section].model,
-                fromIndexPath: sourceIndexPath,
-                toSection: self.presentationState.sections[destinationIndexPath.section].model,
-                toIndexPath: destinationIndexPath
-            ))
+            item.moved(
+                with: .init(
+                    from: from,
+                    fromSection: self.presentationState.sections[from.section].model,
+                    
+                    to: to,
+                    toSection: self.presentationState.sections[to.section].model
+                )
+            )
         }
     }
 }

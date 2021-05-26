@@ -180,24 +180,29 @@ extension ListView
         
         func collectionView(
             _ collectionView: UICollectionView,
-            targetIndexPathForMoveFromItemAt originalIndexPath: IndexPath,
-            toProposedIndexPath proposedIndexPath: IndexPath  
+            targetIndexPathForMoveFromItemAt from: IndexPath,
+            toProposedIndexPath to: IndexPath
         ) -> IndexPath
         {
-            if originalIndexPath != proposedIndexPath {
-                // TODO: Validate
-                // let item = self.presentationState.item(at: originalIndexPath)
-                
-                if originalIndexPath.section == proposedIndexPath.section {
-                    self.view.storage.moveItem(from: originalIndexPath, to: proposedIndexPath)
-                    
-                    return proposedIndexPath
-                } else {
-                    return originalIndexPath
-                }
-            } else {
-                return proposedIndexPath
+            guard from != to else {
+                return from
             }
+            
+            let item = self.presentationState.item(at: from)
+            
+            guard let reordering = item.anyModel.reordering else {
+                return from
+            }
+            
+            let fromSection = self.presentationState.sections[from.section]
+            let toSection = self.presentationState.sections[to.section]
+            
+            return reordering.destination(
+                from: from,
+                fromSection: fromSection.model,
+                to: to,
+                toSection: toSection.model
+            )
         }
         
         // MARK: CollectionViewLayoutDelegate

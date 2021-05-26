@@ -71,6 +71,7 @@ public final class ListView : UIView, KeyboardObserverDelegate
         // Associate ourselves with our child objects.
 
         self.dataSource.presentationState = self.storage.presentationState
+        self.dataSource.storage = self.storage
         self.dataSource.environment = self.environment
         self.dataSource.liveCells = self.liveCells
         

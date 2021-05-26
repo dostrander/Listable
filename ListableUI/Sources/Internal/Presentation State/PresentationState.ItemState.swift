@@ -54,7 +54,7 @@ protocol AnyPresentationItemState : AnyObject
         environment : ListEnvironment
     ) -> CGSize
     
-    func moved(with result : Reordering.Result)
+    func moved(with result : Reordering.ReorderInfo)
 }
 
 
@@ -461,7 +461,7 @@ extension PresentationState
             }
         }
         
-        func moved(with result : Reordering.Result)
+        func moved(with result : Reordering.ReorderInfo)
         {
             self.model.reordering?.didReorder(result)
         }
