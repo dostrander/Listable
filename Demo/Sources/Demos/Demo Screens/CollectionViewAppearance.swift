@@ -99,6 +99,7 @@ struct DemoItem : BlueprintItemContent, Equatable, LocalizedCollatableItemConten
         }
         .inset(horizontal: 15.0, vertical: 10.0)
         .accessibility(label: self.text, traits: [.button])
+        .listReorderGesture(with: info.reordering)
     }
     
     func backgroundElement(with info: ApplyItemContentInfo) -> Element?
