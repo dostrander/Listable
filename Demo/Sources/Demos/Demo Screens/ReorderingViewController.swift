@@ -70,6 +70,26 @@ final class ReorderingViewController : UIViewController
                     }
                 }
             }
+            
+            list += Section("second") { section in
+                section.header = HeaderFooter(DemoHeader(title: "Third Section"))
+                
+                section += Item(DemoItem(text: "2,0  Row (Can't Move)")) { item in
+                    
+                    item.reordering = Reordering(canReorder: { _ in
+                        false
+                    }, didReorder: { result in
+                        print("Moved: \(result.indexPathsDescription)")
+                    })
+                }
+                
+                section += Item(DemoItem(text: "2,1 Row (Same Section Only)")) { item in
+                    
+                    item.reordering = Reordering(sections: .current) { result in
+                        print("Moved: \(result.indexPathsDescription)")
+                    }
+                }
+            }
         }
     }
 }
