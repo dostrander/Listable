@@ -189,6 +189,39 @@ public final class ListLayoutContent
         self.sections[to.section].items.insert(info, at: to.item)
     }
     
+    func move(from : [IndexPath], to : [IndexPath])
+    {
+        precondition(from.count == to.count, "Counts did not match: \(from.count) vs \(to.count).")
+        
+        guard from != to else {
+            return
+        }
+        
+        struct Move {
+            let from : IndexPath
+            let to : IndexPath
+            let item : ItemInfo
+        }
+        
+        let moves = zip(from, to).map { from, to in
+            Move(from: from, to: to, item: self.item(at: from))
+        }.sorted { $0.from < $1.from
+            
+        }
+        
+        /// 1) Remove the moves backwards, so that the removals do not affect earlier indexes.
+        
+        moves.reversed().forEach {
+            self.sections[$0.from.section].items.remove(at: $0.from.item)
+        }
+        
+        /// 2) In inverse order, now add back the items in their new orders.
+        
+        moves.forEach {
+            self.sections[$0.to.section].items.insert($0.item, at: $0.to.item)
+        }
+    }
+    
     //
     // MARK: Layout Data
     //

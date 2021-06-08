@@ -12,6 +12,7 @@ extension ListView
     {
         unowned var view : ListView!
         unowned var presentationState : PresentationState!
+        unowned var layoutManager : LayoutManager!
         
         private let itemMeasurementCache = ReusableViewCache()
         private let headerFooterMeasurementCache = ReusableViewCache()
@@ -185,21 +186,33 @@ extension ListView
         ) -> IndexPath
         {
             ///
-            /// **Note**: Do not use either `from` or `to` index paths passed to this method to
+            /// **Note**: We do not use either `from` or `to` index paths passed to this method to
             /// index into the `presentationState`'s content – it has not yet been updated
             /// to reflect the move, because the move has not yet been committed. The `from` parameter
-            /// Is currently reflecting the current `UICollectionViewLayout`'s state – which will not match.
+            /// is instead reflecting the current `UICollectionViewLayout`'s state – which will not match
+            /// the data source / `presentationState`.
             ///
-            /// Instead, read the `presentationState` off of the layout's `ItemInfo` from the current layout.
+            /// Instead, read the `stateFor(itemAt:)` off of the `layoutManager`. This will reflect
+            /// the right index path.
+            ///
+            /// iOS 15 resolves this issue, by introducing
+            /// ```
+            /// func collectionView(
+            ///     _ collectionView: UICollectionView,
+            ///     targetIndexPathForMoveOfItemFromOriginalIndexPath originalIndexPath: IndexPath,
+            ///     atCurrentIndexPath currentIndexPath: IndexPath,
+            ///     toProposedIndexPath proposedIndexPath: IndexPath
+            /// ) -> IndexPath
+            /// ```
+            /// Which passes the **original** index path, allowing a direct index into your data source.
+            /// Alas, we do not yet support only iOS 15 and later, so, here we are.
             ///
             
             guard from != to else {
                 return from
             }
             
-            print("targetIndexPathForMoveFromItemAt")
-            
-            let item = self.presentationState.item(at: from)
+            let item = self.layoutManager.stateFor(itemAt: from)
             
             guard let reordering = item.anyModel.reordering else {
                 return from

@@ -173,19 +173,15 @@ final class CollectionViewLayout : UICollectionViewLayout
             case .inProgress(let info):
                 
                 if info.from != info.to {
-                    precondition(info.from.count == 1)
-                    precondition(info.to.count == 1)
-                    print("Moving from \(info.from) to \(info.to)")
-                    self.layout.content.move(from: info.from[0], to: info.to[0])
+                    self.layout.content.move(from: info.from, to: info.to)
                     self.layout.content.reindexIndexPaths()
                 }
 
             case .complete(_):
-                self.layout.content.reindexIndexPaths()
+                break
 
             case .cancelled(let info):
-                // TODO: Is this right? If not, we can use the targetIndexPath to revert I think...
-                self.layout.content.move(from: info.from[0], to: info.to[0])
+                self.layout.content.move(from: info.from, to: info.to)
             }
         }
         

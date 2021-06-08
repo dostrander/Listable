@@ -77,6 +77,7 @@ public final class ListView : UIView, KeyboardObserverDelegate
         
         self.delegate.view = self
         self.delegate.presentationState = self.storage.presentationState
+        self.delegate.layoutManager = self.layoutManager
         
         self.keyboardObserver.add(delegate: self)
                 
