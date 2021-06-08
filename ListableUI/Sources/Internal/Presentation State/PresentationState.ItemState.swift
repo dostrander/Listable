@@ -264,7 +264,8 @@ extension PresentationState
             let applyInfo = ApplyItemContentInfo(
                 state: itemState,
                 position: self.itemPosition,
-                reordering: self.reorderingActions,
+                reorderingActions: self.reorderingActions,
+                isReorderable: self.model.reordering != nil,
                 environment: environment
             )
             

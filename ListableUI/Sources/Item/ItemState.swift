@@ -35,6 +35,6 @@ public struct ItemState : Hashable
     
     /// If the item is either selected or highlighted.
     public var isActive : Bool {
-        self.isSelected || self.isHighlighted || self.isReordering
+        self.isSelected || self.isHighlighted
     }
 }

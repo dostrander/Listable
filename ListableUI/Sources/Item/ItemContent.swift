@@ -226,7 +226,11 @@ public struct ApplyItemContentInfo
     public var position : ItemPosition
     
     /// Provides access to actions to handle re-ordering the content within the list.
-    public var reordering : ReorderingActions
+    public var reorderingActions : ReorderingActions
+    
+    /// If the item can be reordered.
+    /// Use this property to determine in your `ItemContent` should render a reorder control.
+    public var isReorderable : Bool
     
     /// The environment of the containing list.
     /// See `ListEnvironment` for usage information.

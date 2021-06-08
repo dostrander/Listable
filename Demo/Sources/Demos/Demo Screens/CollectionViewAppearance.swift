@@ -93,13 +93,28 @@ struct DemoItem : BlueprintItemContent, Equatable, LocalizedCollatableItemConten
     
     func element(with info : ApplyItemContentInfo) -> Element
     {
-        Label(text: self.text) {
-            $0.font = .systemFont(ofSize: 16.0, weight: .medium)
-            $0.color = info.state.isActive ? .white : .darkGray
+        Row { row in
+            row.verticalAlignment = .center
+            
+            row.add(child: Label(text: self.text) {
+                $0.font = .systemFont(ofSize: 16.0, weight: .medium)
+                $0.color = info.state.isActive ? .white : .darkGray
+            })
+            
+            row.addFlexible(child: Spacer(width: 1.0))
+            
+            if info.isReorderable {
+                row.addFixed(
+                    child: Image(
+                        image: UIImage(named: "ReorderControl"),
+                        contentMode: .center
+                    )
+                        .listReorderGesture(with: info.reorderingActions)
+                )
+            }
         }
         .inset(horizontal: 15.0, vertical: 10.0)
         .accessibility(label: self.text, traits: [.button])
-        .listReorderGesture(with: info.reordering)
     }
     
     func backgroundElement(with info: ApplyItemContentInfo) -> Element?
@@ -109,7 +124,7 @@ struct DemoItem : BlueprintItemContent, Equatable, LocalizedCollatableItemConten
             cornerStyle: .rounded(radius: 8.0),
             shadowStyle: .simple(
                 radius: info.state.isReordering ? 4.0 : 2.0,
-                opacity: info.state.isReordering ? 0.25 : 0.15,
+                opacity: info.state.isReordering ? 0.5 : 0.15,
                 offset: .init(width: 0.0, height: 1.0),
                 color: .black
             )

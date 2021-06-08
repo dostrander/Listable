@@ -1241,13 +1241,13 @@ extension ListView : ReorderingActionsDelegate
     // MARK: Internal - Moving Items
     //
     
-    func beginInteractiveMovementFor(item : AnyPresentationItemState) -> Bool
+    func beginInteractiveMovement(for item : AnyPresentationItemState) -> Bool
     {
         guard let indexPath = self.storage.presentationState.indexPath(for: item) else {
             return false
         }
         
-        if self.collectionView.beginInteractiveMovementForItem(at: indexPath) == false {
+        if self.collectionView.beginInteractiveMovementForItem(at: indexPath) {
             /// TODO: Is deferring this until after begin correct?
             item.beginMove(with: self.environment)
             
@@ -1257,21 +1257,24 @@ extension ListView : ReorderingActionsDelegate
         }
     }
     
-    func updateInteractiveMovementTargetPosition(with recognizer : UIPanGestureRecognizer, for item : AnyPresentationItemState)
+    func updateInteractiveMovementTargetPosition(
+        with recognizer : UIPanGestureRecognizer,
+        for item : AnyPresentationItemState
+    )
     {
         let position = recognizer.location(in: self.collectionView)
         
         self.collectionView.updateInteractiveMovementTargetPosition(position)
     }
     
-    func endInteractiveMovement(item : AnyPresentationItemState)
+    func endInteractiveMovement(for item : AnyPresentationItemState)
     {
         item.endMove(with: self.environment)
         
         self.collectionView.endInteractiveMovement()
     }
     
-    func cancelInteractiveMovement(item : AnyPresentationItemState)
+    func cancelInteractiveMovement(for item : AnyPresentationItemState)
     {
         item.endMove(with: self.environment)
         

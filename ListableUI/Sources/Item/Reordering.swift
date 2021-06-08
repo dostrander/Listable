@@ -121,3 +121,50 @@ extension Reordering {
         return to
     }
 }
+
+
+extension Reordering {
+    
+    public final class GestureRecognizer : UIPanGestureRecognizer
+    {
+        public typealias OnStart = () -> Bool
+        
+        public var onStart : OnStart? = nil
+        
+        public typealias OnMove = (UIPanGestureRecognizer) -> ()
+        public var onMove : OnMove? = nil
+        
+        public typealias OnDone = () -> ()
+        public var onDone : OnDone? = nil
+        
+        public override init(target: Any?, action: Selector?)
+        {
+            super.init(target: target, action: action)
+            
+            self.addTarget(self, action: #selector(updated))
+            
+            self.minimumNumberOfTouches = 1
+            self.maximumNumberOfTouches = 1
+        }
+                
+        @objc func updated()
+        {
+            switch self.state {
+            case .possible: break
+            case .began:
+                let canStart = self.onStart?()
+                
+                if canStart == false {
+                    self.state = .cancelled
+                }
+            case .changed:
+                self.onMove?(self)
+
+            case .ended: self.onDone?()
+            case .cancelled, .failed: self.onDone?()
+                
+            @unknown default: listableFatal()
+            }
+        }
+    }
+}
