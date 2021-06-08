@@ -82,6 +82,8 @@ internal extension ListView
             canMoveItemAt indexPath: IndexPath
         ) -> Bool
         {
+            print("canMoveItemAt")
+            
             let item = self.presentationState.item(at: indexPath)
             
             return item.anyModel.reordering != nil
@@ -92,17 +94,17 @@ internal extension ListView
             moveItemAt from: IndexPath,
             to: IndexPath
         ) {
-            print("Moving from \(from) to \(to)")
+            print("moveItemAt from \(from) to \(to)")
             
             self.storage.moveItem(from: from, to: to)
-            
+
             let item = self.presentationState.item(at: to)
-                        
+
             item.moved(
                 with: .init(
                     from: from,
                     fromSection: self.presentationState.sections[from.section].model,
-                    
+
                     to: to,
                     toSection: self.presentationState.sections[to.section].model
                 )

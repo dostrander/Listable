@@ -165,21 +165,27 @@ final class CollectionViewLayout : UICollectionViewLayout
         
         // Handle Moved Items
         
-        if
-            let from = context.previousIndexPathsForInteractivelyMovingItems,
-            let to = context.targetIndexPathsForInteractivelyMovingItems
-        {
-            let from = from[0]
-            let to = to[0]
+        self.isReordering = context.interactiveMoveAction != nil
+        
+        if let action = context.interactiveMoveAction {
             
-            let item = self.layout.content.item(at: from)
-            item.liveIndexPath = to
-                    
-            self.layout.content.move(from: from, to: to)
-            
-            if from != to {
-                context.performedInteractiveMove = true
-                self.layout.content.reindexLiveIndexPaths()
+            switch action {
+            case .inProgress(let info):
+                
+                if info.from != info.to {
+                    precondition(info.from.count == 1)
+                    precondition(info.to.count == 1)
+                    print("Moving from \(info.from) to \(info.to)")
+                    self.layout.content.move(from: info.from[0], to: info.to[0])
+                    self.layout.content.reindexIndexPaths()
+                }
+
+            case .complete(_):
+                self.layout.content.reindexIndexPaths()
+
+            case .cancelled(let info):
+                // TODO: Is this right? If not, we can use the targetIndexPath to revert I think...
+                self.layout.content.move(from: info.from[0], to: info.to[0])
             }
         }
         
@@ -199,16 +205,21 @@ final class CollectionViewLayout : UICollectionViewLayout
         previousPosition: CGPoint
     ) -> UICollectionViewLayoutInvalidationContext
     {
-        self.isReordering = true
-        
-        print("invalidationContext(forInteractivelyMovingItems: ...")
-        
         let context = super.invalidationContext(
             forInteractivelyMovingItems: targetIndexPaths,
             withTargetPosition: targetPosition,
             previousIndexPaths: previousIndexPaths,
             previousPosition: previousPosition
         ) as! InvalidationContext
+
+        context.interactiveMoveAction = .inProgress(
+            .init(
+                from: previousIndexPaths,
+                fromPosition: previousPosition,
+                to: targetIndexPaths,
+                toPosition: targetPosition
+            )
+        )
         
         return context
     }
@@ -219,20 +230,29 @@ final class CollectionViewLayout : UICollectionViewLayout
         movementCancelled: Bool
     ) -> UICollectionViewLayoutInvalidationContext
     {
-        isReordering = false
-        
-        listablePrecondition(movementCancelled == false, "Cancelling moves is currently not supported.")
-        
-        print("invalidationContextForEndingInteractiveMovementOfItems")
-        
-        self.layout.content.reindexLiveIndexPaths()
-        self.layout.content.reindexDelegateProvidedIndexPaths()
-        
         let context = super.invalidationContextForEndingInteractiveMovementOfItems(
             toFinalIndexPaths: indexPaths,
             previousIndexPaths: previousIndexPaths,
             movementCancelled: movementCancelled
         ) as! InvalidationContext
+        
+        context.interactiveMoveAction = {
+            if movementCancelled {
+                 return .cancelled(
+                    .init(
+                        from: previousIndexPaths,
+                        to: indexPaths
+                    )
+                )
+            } else {
+                return .complete(
+                    .init(
+                        from: previousIndexPaths,
+                        to: indexPaths
+                    )
+                )
+            }
+        }()
                                 
         return context
     }
@@ -246,7 +266,31 @@ final class CollectionViewLayout : UICollectionViewLayout
     {
         var viewPropertiesChanged : Bool = false
         
-        var performedInteractiveMove : Bool = false
+        var interactiveMoveAction : InteractiveMoveAction? = nil
+        
+        enum InteractiveMoveAction {
+            case inProgress(InProgress)
+            case complete(Complete)
+            case cancelled(Cancelled)
+            
+            struct InProgress {
+                var from : [IndexPath]
+                var fromPosition : CGPoint
+                
+                var to : [IndexPath]
+                var toPosition : CGPoint
+            }
+            
+            struct Complete {
+                var from : [IndexPath]
+                var to : [IndexPath]
+            }
+            
+            struct Cancelled {
+                var from : [IndexPath]
+                var to : [IndexPath]
+            }
+        }
     }
     
     //
@@ -263,7 +307,7 @@ final class CollectionViewLayout : UICollectionViewLayout
             let context = context as! InvalidationContext
             
             let requeryDataSourceCounts = context.invalidateEverything || context.invalidateDataSourceCounts
-            let needsRelayout = context.viewPropertiesChanged || context.performedInteractiveMove
+            let needsRelayout = context.viewPropertiesChanged || context.interactiveMoveAction != nil
             
             if requeryDataSourceCounts {
                 self.merge(with: .rebuild)

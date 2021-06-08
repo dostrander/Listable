@@ -37,8 +37,7 @@ class ListLayoutContentTests : XCTestCase
         
         let items : [ListLayoutContent.ItemInfo] = (0...1).map { index in
             .init(
-                delegateProvidedIndexPath: IndexPath(item: index, section: 0),
-                liveIndexPath: IndexPath(item: index, section: 0),
+                indexPath: IndexPath(item: index, section: 0),
                 layouts: .init(),
                 insertAndRemoveAnimations: .fade,
                 measurer: { _ in .zero }
@@ -105,8 +104,7 @@ class ListLayoutContent_SectionInfo_Tests : XCTestCase
         
         let items : [ListLayoutContent.ItemInfo] = (0...1).map { index in
             .init(
-                delegateProvidedIndexPath: IndexPath(item: index, section: 0),
-                liveIndexPath: IndexPath(item: index, section: 0),
+                indexPath: IndexPath(item: index, section: 0),
                 layouts: .init(),
                 insertAndRemoveAnimations: .fade,
                 measurer: { _ in .zero }
@@ -154,8 +152,7 @@ class ListLayoutContent_SectionInfo_Tests : XCTestCase
         
         let items : [ListLayoutContent.ItemInfo] = (0...1).map { index in
             .init(
-                delegateProvidedIndexPath: IndexPath(item: index, section: 0),
-                liveIndexPath: IndexPath(item: index, section: 0),
+                indexPath: IndexPath(item: index, section: 0),
                 layouts: .init(),
                 insertAndRemoveAnimations: .fade,
                 measurer: { _ in .zero }

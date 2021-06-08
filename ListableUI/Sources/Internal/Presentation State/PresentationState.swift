@@ -435,8 +435,8 @@ extension PresentationState
                 guard let header = self.header.state else { return nil }
                 
                 return .init(
+                    state: header,
                     kind: .listHeader,
-                    layouts: header.anyModel.layouts,
                     isPopulated: true,
                     measurer: { info in
                         header.size(for: info, cache: self.headerFooterMeasurementCache, environment: environment)
@@ -447,8 +447,8 @@ extension PresentationState
                 guard let footer = self.footer.state else { return nil }
                 
                 return .init(
+                    state: footer,
                     kind: .listFooter,
-                    layouts: footer.anyModel.layouts,
                     isPopulated: true,
                     measurer: { info in
                         footer.size(for: info, cache: self.headerFooterMeasurementCache, environment: environment)
@@ -459,8 +459,8 @@ extension PresentationState
                 guard let footer = self.overscrollFooter.state else { return nil }
                 
                 return .init(
+                    state: footer,
                     kind: .overscrollFooter,
-                    layouts: footer.anyModel.layouts,
                     isPopulated: true,
                     measurer: { info in
                         footer.size(for: info, cache: self.headerFooterMeasurementCache, environment: environment)
@@ -469,13 +469,13 @@ extension PresentationState
             }(),
             sections: self.sections.mapWithIndex { sectionIndex, _, section in
                 .init(
-                    layouts: section.model.layouts,
+                    state: section,
                     header: {
                         guard let header = section.header.state else { return nil }
                         
                         return .init(
+                            state: header,
                             kind: .sectionHeader,
-                            layouts: header.anyModel.layouts,
                             isPopulated: true,
                             measurer: { info in
                                 header.size(for: info, cache: self.headerFooterMeasurementCache, environment: environment)
@@ -486,8 +486,8 @@ extension PresentationState
                         guard let footer = section.footer.state else { return nil }
                         
                         return .init(
+                            state: footer,
                             kind: .sectionFooter,
-                            layouts: footer.anyModel.layouts,
                             isPopulated: true,
                             measurer: { info in
                                 footer.size(for: info, cache: self.headerFooterMeasurementCache, environment: environment)
@@ -496,9 +496,8 @@ extension PresentationState
                     }(),
                     items: section.items.mapWithIndex { itemIndex, _, item in
                         .init(
-                            delegateProvidedIndexPath: IndexPath(item: itemIndex, section: sectionIndex),
-                            liveIndexPath: IndexPath(item: itemIndex, section: sectionIndex),
-                            layouts: item.anyModel.layouts,
+                            state: item,
+                            indexPath: IndexPath(item: itemIndex, section: sectionIndex),
                             insertAndRemoveAnimations: item.anyModel.insertAndRemoveAnimations ?? defaults.itemInsertAndRemoveAnimations,
                             measurer: { info in
                                 item.size(for: info, cache: self.itemMeasurementCache, environment: environment)

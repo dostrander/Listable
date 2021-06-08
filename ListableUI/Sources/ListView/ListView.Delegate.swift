@@ -184,9 +184,20 @@ extension ListView
             toProposedIndexPath to: IndexPath
         ) -> IndexPath
         {
+            ///
+            /// **Note**: Do not use either `from` or `to` index paths passed to this method to
+            /// index into the `presentationState`'s content – it has not yet been updated
+            /// to reflect the move, because the move has not yet been committed. The `from` parameter
+            /// Is currently reflecting the current `UICollectionViewLayout`'s state – which will not match.
+            ///
+            /// Instead, read the `presentationState` off of the layout's `ItemInfo` from the current layout.
+            ///
+            
             guard from != to else {
                 return from
             }
+            
+            print("targetIndexPathForMoveFromItemAt")
             
             let item = self.presentationState.item(at: from)
             
