@@ -1168,7 +1168,7 @@ public final class ListView : UIView, KeyboardObserverDelegate
         }
         
         if changes.hasIndexAffectingChanges {
-            self.cancelAllInteractiveMoves()
+            self.cancelAllInProgressReorders()
         }
         
         self.collectionViewLayout.setShouldAskForItemSizesDuringLayoutInvalidation()
@@ -1241,15 +1241,14 @@ extension ListView : ReorderingActionsDelegate
     // MARK: Internal - Moving Items
     //
     
-    func beginInteractiveMovement(for item : AnyPresentationItemState) -> Bool
+    func beginReorder(for item : AnyPresentationItemState) -> Bool
     {
         guard let indexPath = self.storage.presentationState.indexPath(for: item) else {
             return false
         }
         
         if self.collectionView.beginInteractiveMovementForItem(at: indexPath) {
-            /// TODO: Is deferring this until after begin correct?
-            item.beginMove(with: self.environment)
+            item.beginReorder(with: self.environment)
             
             return true
         } else {
@@ -1257,7 +1256,7 @@ extension ListView : ReorderingActionsDelegate
         }
     }
     
-    func updateInteractiveMovementTargetPosition(
+    func updateReorderTargetPosition(
         with recognizer : UIPanGestureRecognizer,
         for item : AnyPresentationItemState
     )
@@ -1267,24 +1266,24 @@ extension ListView : ReorderingActionsDelegate
         self.collectionView.updateInteractiveMovementTargetPosition(position)
     }
     
-    func endInteractiveMovement(for item : AnyPresentationItemState)
+    func endReorder(for item : AnyPresentationItemState)
     {
-        item.endMove(with: self.environment)
+        item.endReorder(with: self.environment)
         
         self.collectionView.endInteractiveMovement()
     }
     
-    func cancelInteractiveMovement(for item : AnyPresentationItemState)
+    func cancelReorder(for item : AnyPresentationItemState)
     {
-        item.endMove(with: self.environment)
+        item.endReorder(with: self.environment)
         
         self.collectionView.cancelInteractiveMovement()
     }
     
-    func cancelAllInteractiveMoves() {
+    func cancelAllInProgressReorders() {
         
         self.storage.presentationState.forEachItem { _, item in
-            item.endMove(with: self.environment)
+            item.endReorder(with: self.environment)
         }
         
         self.collectionView.cancelInteractiveMovement()

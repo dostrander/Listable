@@ -96,7 +96,7 @@ internal extension ListView
 
             let item = self.presentationState.item(at: to)
 
-            item.moved(
+            item.reordered(
                 with: .init(
                     from: from,
                     fromSection: self.presentationState.sections[from.section].model,

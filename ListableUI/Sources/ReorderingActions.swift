@@ -32,7 +32,7 @@ public final class ReorderingActions
             return false
         }
         
-        if delegate.beginInteractiveMovement(for: item) {
+        if delegate.beginReorder(for: item) {
             self.isMoving = true
             
             return true
@@ -51,7 +51,7 @@ public final class ReorderingActions
             return
         }
         
-        self.delegate?.updateInteractiveMovementTargetPosition(with: recognizer, for: item)
+        self.delegate?.updateReorderTargetPosition(with: recognizer, for: item)
     }
     
     public func end()
@@ -66,15 +66,15 @@ public final class ReorderingActions
         
         self.isMoving = false
         
-        self.delegate?.endInteractiveMovement(for: item)
+        self.delegate?.endReorder(for: item)
     }
 }
 
 
 protocol ReorderingActionsDelegate : AnyObject
 {
-    func beginInteractiveMovement(for item : AnyPresentationItemState) -> Bool
-    func updateInteractiveMovementTargetPosition(with recognizer : UIPanGestureRecognizer, for item : AnyPresentationItemState)
-    func endInteractiveMovement(for item : AnyPresentationItemState)
-    func cancelInteractiveMovement(for item : AnyPresentationItemState)
+    func beginReorder(for item : AnyPresentationItemState) -> Bool
+    func updateReorderTargetPosition(with recognizer : UIPanGestureRecognizer, for item : AnyPresentationItemState)
+    func endReorder(for item : AnyPresentationItemState)
+    func cancelReorder(for item : AnyPresentationItemState)
 }

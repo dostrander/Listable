@@ -217,6 +217,8 @@ public struct ItemContentViews<Content:ItemContent>
 /// You can use this information to alter the display of your content, such as changing
 /// the background color for highlights and selections, providing different corner styles
 /// for different item positions, etc.
+///
+/// TODO: Rename to `ApplyItemContext`
 public struct ApplyItemContentInfo
 {
     /// The state of the `Item` currently displaying the content. Is it highlighted, selected, etc.

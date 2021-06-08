@@ -54,13 +54,13 @@ protocol AnyPresentationItemState : AnyObject
         environment : ListEnvironment
     ) -> CGSize
     
-    func beginMove(with environment: ListEnvironment)
-    func endMove(with environment: ListEnvironment)
+    func beginReorder(with environment: ListEnvironment)
+    func endReorder(with environment: ListEnvironment)
     
-    var isMoving : Bool { get }
+    var isReordering : Bool { get }
     
     /// TODO: Ensure only called when NOT cancelled
-    func moved(with result : Reordering.ReorderInfo)
+    func reordered(with result : Reordering.ReorderInfo)
 }
 
 
@@ -293,7 +293,7 @@ extension PresentationState
             
             self.applyTo(
                 cell: cell,
-                itemState: .init(cell: cell, isReordering: self.isMoving),
+                itemState: .init(cell: cell, isReordering: self.isReordering),
                 reason: .wasUpdated,
                 environment: environment
             )
@@ -468,35 +468,35 @@ extension PresentationState
             }
         }
         
-        func beginMove(with environment: ListEnvironment) {
+        func beginReorder(with environment: ListEnvironment) {
             
-            if self.isMoving {
+            if self.isReordering {
                 return
             }
             
-            self.isMoving = true
+            self.isReordering = true
             
             UIView.animate(withDuration: 0.15) {
                 self.applyToVisibleCell(with: environment)
             }
         }
         
-        func endMove(with environment: ListEnvironment) {
+        func endReorder(with environment: ListEnvironment) {
             
-            guard self.isMoving else {
+            guard self.isReordering else {
                 return
             }
             
-            self.isMoving = false
+            self.isReordering = false
             
             UIView.animate(withDuration: 0.15) {
                 self.applyToVisibleCell(with: environment)
             }
         }
         
-        private(set) var isMoving : Bool = false
+        private(set) var isReordering : Bool = false
         
-        func moved(with result : Reordering.ReorderInfo)
+        func reordered(with result : Reordering.ReorderInfo)
         {
             self.model.reordering?.didReorder(result)
         }
