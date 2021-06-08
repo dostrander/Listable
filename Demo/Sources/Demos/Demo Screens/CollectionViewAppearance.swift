@@ -107,7 +107,12 @@ struct DemoItem : BlueprintItemContent, Equatable, LocalizedCollatableItemConten
         Box(
             backgroundColor: .white,
             cornerStyle: .rounded(radius: 8.0),
-            shadowStyle: .simple(radius: 2.0, opacity: 0.15, offset: .init(width: 0.0, height: 1.0), color: .black)
+            shadowStyle: .simple(
+                radius: info.state.isReordering ? 4.0 : 2.0,
+                opacity: info.state.isReordering ? 0.25 : 0.15,
+                offset: .init(width: 0.0, height: 1.0),
+                color: .black
+            )
         )
     }
     

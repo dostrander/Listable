@@ -68,6 +68,10 @@ extension Reordering {
         
         public var to : IndexPath
         public var toSection : Section
+        
+        public var indexPathsDescription : String {
+            "(\(from) -> \(to))"
+        }
     }
 }
 

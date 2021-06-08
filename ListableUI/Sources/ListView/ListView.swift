@@ -1168,7 +1168,7 @@ public final class ListView : UIView, KeyboardObserverDelegate
         }
         
         if changes.hasIndexAffectingChanges {
-            self.cancelInteractiveMovement()
+            self.cancelAllInteractiveMoves()
         }
         
         self.collectionViewLayout.setShouldAskForItemSizesDuringLayoutInvalidation()
@@ -1247,23 +1247,43 @@ extension ListView : ReorderingActionsDelegate
             return false
         }
         
-        return self.collectionView.beginInteractiveMovementForItem(at: indexPath)
+        if self.collectionView.beginInteractiveMovementForItem(at: indexPath) == false {
+            /// TODO: Is deferring this until after begin correct?
+            item.beginMove(with: self.environment)
+            
+            return true
+        } else {
+            return false
+        }
     }
     
-    func updateInteractiveMovementTargetPosition(with recognizer : UIPanGestureRecognizer)
+    func updateInteractiveMovementTargetPosition(with recognizer : UIPanGestureRecognizer, for item : AnyPresentationItemState)
     {
         let position = recognizer.location(in: self.collectionView)
         
         self.collectionView.updateInteractiveMovementTargetPosition(position)
     }
     
-    func endInteractiveMovement()
+    func endInteractiveMovement(item : AnyPresentationItemState)
     {
+        item.endMove(with: self.environment)
+        
         self.collectionView.endInteractiveMovement()
     }
     
-    func cancelInteractiveMovement()
+    func cancelInteractiveMovement(item : AnyPresentationItemState)
     {
+        item.endMove(with: self.environment)
+        
+        self.collectionView.cancelInteractiveMovement()
+    }
+    
+    func cancelAllInteractiveMoves() {
+        
+        self.storage.presentationState.forEachItem { _, item in
+            item.endMove(with: self.environment)
+        }
+        
         self.collectionView.cancelInteractiveMovement()
     }
 }

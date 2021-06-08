@@ -20,14 +20,22 @@ public final class ReorderingActions
     
     public func beginMoving() -> Bool
     {
-        guard self.isMoving == false else {
-            return true
+        guard let item = self.item else {
+            return false
         }
         
-        self.isMoving = true
+        guard self.isMoving == false else {
+            return false
+        }
         
-        if let delegate = self.delegate, let item = self.item {
-            return delegate.beginInteractiveMovementFor(item: item)
+        guard let delegate = self.delegate else {
+            return false
+        }
+        
+        if delegate.beginInteractiveMovementFor(item: item) {
+            self.isMoving = true
+            
+            return true
         } else {
             return false
         }
@@ -39,7 +47,11 @@ public final class ReorderingActions
             return
         }
         
-        self.delegate?.updateInteractiveMovementTargetPosition(with: recognizer)
+        guard let item = self.item else {
+            return
+        }
+        
+        self.delegate?.updateInteractiveMovementTargetPosition(with: recognizer, for: item)
     }
     
     public func end()
@@ -48,9 +60,13 @@ public final class ReorderingActions
             return
         }
         
+        guard let item = self.item else {
+            return
+        }
+        
         self.isMoving = false
         
-        self.delegate?.endInteractiveMovement()
+        self.delegate?.endInteractiveMovement(item: item)
     }
 }
 
@@ -58,7 +74,7 @@ public final class ReorderingActions
 protocol ReorderingActionsDelegate : AnyObject
 {
     func beginInteractiveMovementFor(item : AnyPresentationItemState) -> Bool
-    func updateInteractiveMovementTargetPosition(with recognizer : UIPanGestureRecognizer)
-    func endInteractiveMovement()
-    func cancelInteractiveMovement()
+    func updateInteractiveMovementTargetPosition(with recognizer : UIPanGestureRecognizer, for item : AnyPresentationItemState)
+    func endInteractiveMovement(item : AnyPresentationItemState)
+    func cancelInteractiveMovement(item : AnyPresentationItemState)
 }

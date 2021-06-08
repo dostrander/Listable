@@ -33,21 +33,21 @@ final class ReorderingViewController : UIViewController
                 section += Item(DemoItem(text: "0,0 Row")) { item in
                     
                     item.reordering = Reordering { result in
-                        print("Moved")
+                        print("Moved: \(result.indexPathsDescription)")
                     }
                 }
                 
                 section += Item(DemoItem(text: "0,1 Row")) { item in
                     
                     item.reordering = Reordering { result in
-                        print("Moved")
+                        print("Moved: \(result.indexPathsDescription)")
                     }
                 }
                 
                 section += Item(DemoItem(text: "0,2 Row")) { item in
                     
                     item.reordering = Reordering { result in
-                        print("Moved")
+                        print("Moved: \(result.indexPathsDescription)")
                     }
                 }
             }
@@ -58,7 +58,7 @@ final class ReorderingViewController : UIViewController
                 section += Item(DemoItem(text: "1,0  Row")) { item in
                     
                     item.reordering = Reordering { result in
-                        print("Moved")
+                        print("Moved: \(result.indexPathsDescription)")
                     }
                     
                 }
@@ -66,7 +66,7 @@ final class ReorderingViewController : UIViewController
                 section += Item(DemoItem(text: "1,1 Row")) { item in
                     
                     item.reordering = Reordering { result in
-                        print("Moved")
+                        print("Moved: \(result.indexPathsDescription)")
                     }
                 }
             }

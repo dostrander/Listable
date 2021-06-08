@@ -53,7 +53,7 @@ public struct ItemPreview : View
         /// Creates a new preview with the desired options.
         public init(
             with width : CGFloat = UIScreen.main.bounds.width,
-            state : ItemState = .init(isSelected: false, isHighlighted: false),
+            state : ItemState = .init(isSelected: false, isHighlighted: false, isReordering: false),
             appearance : ItemPreviewAppearance = .init()
         ) {
             self.width = width
@@ -109,10 +109,10 @@ public struct ItemPreview : View
     ) -> some View
     {
         let states : [ItemState] = [
-            ItemState(isSelected: false, isHighlighted: false),
-            ItemState(isSelected: false, isHighlighted: true),
-            ItemState(isSelected: true, isHighlighted: false),
-            ItemState(isSelected: true, isHighlighted: true),
+            ItemState(isSelected: false, isHighlighted: false, isReordering: false),
+            ItemState(isSelected: false, isHighlighted: true, isReordering: false),
+            ItemState(isSelected: true, isHighlighted: false, isReordering: false),
+            ItemState(isSelected: true, isHighlighted: true, isReordering: false),
         ]
         
         return Self.previews(for: item, with: states.map {
@@ -128,7 +128,7 @@ public struct ItemPreview : View
     public init(
         _ item : AnyItem,
         width : CGFloat = UIScreen.main.bounds.width,
-        state : ItemState = .init(isSelected: false, isHighlighted: false),
+        state : ItemState = .init(isSelected: false, isHighlighted: false, isReordering: false),
         appearance : ItemPreviewAppearance = .init()
     ) {
         self.init(

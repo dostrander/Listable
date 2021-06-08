@@ -54,6 +54,12 @@ protocol AnyPresentationItemState : AnyObject
         environment : ListEnvironment
     ) -> CGSize
     
+    func beginMove(with environment: ListEnvironment)
+    func endMove(with environment: ListEnvironment)
+    
+    var isMoving : Bool { get }
+    
+    /// TODO: Ensure only called when NOT cancelled
     func moved(with result : Reordering.ReorderInfo)
 }
 
@@ -235,7 +241,7 @@ extension PresentationState
             
             // Theme cell & apply content.
             
-            let itemState = ListableUI.ItemState(cell: cell)
+            let itemState = ListableUI.ItemState(cell: cell, isReordering: false)
             
             self.applyTo(
                 cell: cell,
@@ -286,7 +292,7 @@ extension PresentationState
             
             self.applyTo(
                 cell: cell,
-                itemState: .init(cell: cell),
+                itemState: .init(cell: cell, isReordering: self.isMoving),
                 reason: .wasUpdated,
                 environment: environment
             )
@@ -441,7 +447,7 @@ extension PresentationState
                     create: {
                         return ItemCell<Content>()
                 }, { cell in
-                    let itemState = ListableUI.ItemState(isSelected: false, isHighlighted: false)
+                    let itemState = ListableUI.ItemState(isSelected: false, isHighlighted: false, isReordering: false)
                     
                     self.applyTo(
                         cell: cell,
@@ -460,6 +466,34 @@ extension PresentationState
                 return size
             }
         }
+        
+        func beginMove(with environment: ListEnvironment) {
+            
+            if self.isMoving {
+                return
+            }
+            
+            self.isMoving = true
+            
+            UIView.animate(withDuration: 0.15) {
+                self.applyToVisibleCell(with: environment)
+            }
+        }
+        
+        func endMove(with environment: ListEnvironment) {
+            
+            guard self.isMoving else {
+                return
+            }
+            
+            self.isMoving = false
+            
+            UIView.animate(withDuration: 0.15) {
+                self.applyToVisibleCell(with: environment)
+            }
+        }
+        
+        private(set) var isMoving : Bool = false
         
         func moved(with result : Reordering.ReorderInfo)
         {
