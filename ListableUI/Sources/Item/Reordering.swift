@@ -49,6 +49,9 @@ public struct Reordering
 
 extension Reordering {
     
+    ///
+    ///
+    ///
     public enum Sections : Equatable {
         
         ///
@@ -61,16 +64,122 @@ extension Reordering {
         case specific(Set<AnyIdentifier>)
     }
     
+    ///
+    ///
+    ///
     public struct ReorderInfo {
+        
+        // MARK: Public Properties
         
         public var from : IndexPath
         public var fromSection : Section
+        public var fromIdentifiers : [AnyIdentifier]
         
         public var to : IndexPath
         public var toSection : Section
+        public var toIdentifiers : [AnyIdentifier]
+        
+        // MARK: Initialization
+        
+        public init(
+            from: IndexPath,
+            fromSection: Section,
+            to: IndexPath,
+            toSection: Section
+        ) {
+            self.from = from
+            self.fromSection = fromSection
+            self.fromIdentifiers = fromSection.items.map(\.identifier)
+            self.to = to
+            self.toSection = toSection
+            self.toIdentifiers = toSection.items.map(\.identifier)
+        }
+        
+        // MARK: Reading Values
         
         public var indexPathsDescription : String {
             "(\(from) -> \(to))"
+        }
+    }
+}
+
+
+extension Reordering {
+    
+    ///
+    ///
+    ///
+    public final class GestureRecognizer : UIPanGestureRecognizer
+    {
+        public typealias OnStart = () -> Bool
+        public var onStart : OnStart? = nil
+        
+        public typealias OnMove = (GestureRecognizer) -> ()
+        public var onMove : OnMove? = nil
+        
+        public typealias OnEnd = (Bool) -> ()
+        public var onEnd : OnEnd? = nil
+        
+        public override init(target: Any?, action: Selector?)
+        {
+            super.init(target: target, action: action)
+            
+            self.addTarget(self, action: #selector(updated))
+            
+            self.minimumNumberOfTouches = 1
+            self.maximumNumberOfTouches = 1
+        }
+        
+        public func apply(actions : ReorderingActions) {
+            
+            self.onStart = actions.start
+            self.onMove = actions.moved(with:)
+            self.onEnd = actions.end(_:)
+        }
+        
+        public func reorderPosition(in collectionView : UIView) -> CGPoint? {
+            
+            guard let initial = self.initialCenter else {
+                return nil
+            }
+            
+            let translation = self.translation(in: collectionView)
+            
+            return CGPoint(
+                x: initial.x + translation.x,
+                y: initial.y + translation.y
+            )
+        }
+        
+        private var initialCenter : CGPoint? = nil
+                
+        @objc private func updated()
+        {
+            switch self.state {
+            case .possible: break
+            case .began:
+                let canStart = self.onStart?()
+                
+                let center = self.view?.firstSuperview(ofType: UICollectionViewCell.self)?.center
+                
+                if let center = center, canStart == true {
+                    self.initialCenter = center
+                } else {
+                    self.state = .cancelled
+                }
+            case .changed:
+                self.onMove?(self)
+
+            case .ended:
+                self.onEnd?(true)
+                self.initialCenter = nil
+                
+            case .cancelled, .failed:
+                self.onEnd?(false)
+                self.initialCenter = nil
+                
+            @unknown default: listableFatal()
+            }
         }
     }
 }
@@ -119,52 +228,5 @@ extension Reordering {
         }
         
         return to
-    }
-}
-
-
-extension Reordering {
-    
-    public final class GestureRecognizer : UIPanGestureRecognizer
-    {
-        public typealias OnStart = () -> Bool
-        
-        public var onStart : OnStart? = nil
-        
-        public typealias OnMove = (UIPanGestureRecognizer) -> ()
-        public var onMove : OnMove? = nil
-        
-        public typealias OnDone = () -> ()
-        public var onDone : OnDone? = nil
-        
-        public override init(target: Any?, action: Selector?)
-        {
-            super.init(target: target, action: action)
-            
-            self.addTarget(self, action: #selector(updated))
-            
-            self.minimumNumberOfTouches = 1
-            self.maximumNumberOfTouches = 1
-        }
-                
-        @objc func updated()
-        {
-            switch self.state {
-            case .possible: break
-            case .began:
-                let canStart = self.onStart?()
-                
-                if canStart == false {
-                    self.state = .cancelled
-                }
-            case .changed:
-                self.onMove?(self)
-
-            case .ended: self.onDone?()
-            case .cancelled, .failed: self.onDone?()
-                
-            @unknown default: listableFatal()
-            }
-        }
     }
 }

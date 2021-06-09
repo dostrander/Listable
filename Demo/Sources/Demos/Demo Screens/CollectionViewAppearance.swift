@@ -123,7 +123,7 @@ struct DemoItem : BlueprintItemContent, Equatable, LocalizedCollatableItemConten
             backgroundColor: .white,
             cornerStyle: .rounded(radius: 8.0),
             shadowStyle: .simple(
-                radius: info.state.isReordering ? 4.0 : 2.0,
+                radius: info.state.isReordering ? 5.0 : 2.0,
                 opacity: info.state.isReordering ? 0.5 : 0.15,
                 offset: .init(width: 0.0, height: 1.0),
                 color: .black

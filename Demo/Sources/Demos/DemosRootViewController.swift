@@ -97,7 +97,7 @@ public final class DemosRootViewController : ListViewController
             })
             
             section += Item(
-                DemoItem(text: "Reordering (Experimental)"),
+                DemoItem(text: "Reordering"),
                 selectionStyle: .selectable(),
                 onSelect : { _ in
                     self.push(ReorderingViewController())

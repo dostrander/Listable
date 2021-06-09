@@ -30,6 +30,8 @@ final class ReorderingViewController : UIViewController
             list += Section("first") { section in
                 section.header = HeaderFooter(DemoHeader(title: "First Section"))
                 
+                section.layouts.table.columns = .init(count: 2, spacing: 15.0)
+                
                 section += Item(DemoItem(text: "0,0 Row")) { item in
                     
                     item.reordering = Reordering { result in
@@ -45,6 +47,13 @@ final class ReorderingViewController : UIViewController
                 }
                 
                 section += Item(DemoItem(text: "0,2 Row")) { item in
+                    
+                    item.reordering = Reordering { result in
+                        print("Moved: \(result.indexPathsDescription)")
+                    }
+                }
+                
+                section += Item(DemoItem(text: "0,3 Row")) { item in
                     
                     item.reordering = Reordering { result in
                         print("Moved: \(result.indexPathsDescription)")

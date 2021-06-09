@@ -269,6 +269,17 @@ final class CollectionViewLayout : UICollectionViewLayout
             case complete(Complete)
             case cancelled(Cancelled)
             
+            var shouldRelayout : Bool {
+                switch self {
+                case .inProgress(let info):
+                    return info.from != info.to
+                case .complete(_):
+                    return false
+                case .cancelled(_):
+                    return true
+                }
+            }
+            
             struct InProgress {
                 var from : [IndexPath]
                 var fromPosition : CGPoint
@@ -303,7 +314,7 @@ final class CollectionViewLayout : UICollectionViewLayout
             let context = context as! InvalidationContext
             
             let requeryDataSourceCounts = context.invalidateEverything || context.invalidateDataSourceCounts
-            let needsRelayout = context.viewPropertiesChanged || context.interactiveMoveAction != nil
+            let needsRelayout = context.viewPropertiesChanged || context.interactiveMoveAction?.shouldRelayout ?? false
             
             if requeryDataSourceCounts {
                 self.merge(with: .rebuild)
@@ -556,14 +567,22 @@ final class CollectionViewLayout : UICollectionViewLayout
     // MARK: UICollectionViewLayout Methods: Moving Items
     //
     
-    override func layoutAttributesForInteractivelyMovingItem(at indexPath: IndexPath, withTargetPosition position: CGPoint) -> UICollectionViewLayoutAttributes
+    override func layoutAttributesForInteractivelyMovingItem(
+        at indexPath: IndexPath,
+        withTargetPosition position: CGPoint
+    ) -> UICollectionViewLayoutAttributes
     {
-        let defaultAttributes = self.layout.content.layoutAttributes(at: indexPath)
-        let attributes = super.layoutAttributesForInteractivelyMovingItem(at: indexPath, withTargetPosition: position)
+        let original = self.layout.content.layoutAttributes(at: indexPath)
+        let current = super.layoutAttributesForInteractivelyMovingItem(at: indexPath, withTargetPosition: position)
         
-        attributes.center.x = defaultAttributes.center.x
+        self.layout.adjust(
+            layoutAttributesForReorderingItem: current,
+            originalAttributes: original,
+            at: indexPath,
+            withTargetPosition: position
+        )
         
-        return attributes
+        return current
     }
 }
 

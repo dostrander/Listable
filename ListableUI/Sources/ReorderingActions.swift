@@ -18,7 +18,7 @@ public final class ReorderingActions
         self.isMoving = false
     }
     
-    public func beginMoving() -> Bool
+    public func start() -> Bool
     {
         guard let item = self.item else {
             return false
@@ -41,7 +41,7 @@ public final class ReorderingActions
         }
     }
     
-    public func moved(with recognizer : UIPanGestureRecognizer)
+    public func moved(with recognizer : Reordering.GestureRecognizer)
     {
         guard self.isMoving else {
             return
@@ -54,7 +54,7 @@ public final class ReorderingActions
         self.delegate?.updateReorderTargetPosition(with: recognizer, for: item)
     }
     
-    public func end()
+    public func end(_ cancelled : Bool)
     {
         guard self.isMoving else {
             return
@@ -74,7 +74,7 @@ public final class ReorderingActions
 protocol ReorderingActionsDelegate : AnyObject
 {
     func beginReorder(for item : AnyPresentationItemState) -> Bool
-    func updateReorderTargetPosition(with recognizer : UIPanGestureRecognizer, for item : AnyPresentationItemState)
+    func updateReorderTargetPosition(with recognizer : Reordering.GestureRecognizer, for item : AnyPresentationItemState)
     func endReorder(for item : AnyPresentationItemState)
     func cancelReorder(for item : AnyPresentationItemState)
 }

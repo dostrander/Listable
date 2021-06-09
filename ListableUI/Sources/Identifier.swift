@@ -77,6 +77,10 @@ public final class Identifier<Represented> : AnyIdentifier
 ///
 public class AnyIdentifier : Hashable, CustomDebugStringConvertible
 {
+    public var base : Any {
+        self.value.base
+    }
+    
     private let representedType : ObjectIdentifier
     
     fileprivate let value : AnyHashable

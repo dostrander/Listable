@@ -86,6 +86,33 @@ public struct Section
     }
     
     //
+    // MARK: Reading Typed Values
+    //
+    
+    ///
+    public func read<IdentifierType:Hashable, ContentType:ItemContent>(
+        identifier identifierType : IdentifierType.Type,
+        content contentType : ContentType.Type,
+        using block : (TypedSection<IdentifierType, ContentType>) throws -> ()
+    ) throws
+    {
+        guard let identifier = self.identifier.base as? IdentifierType else {
+            throw ReadError.incorrectIdentifierType(self.identifier)
+        }
+        
+        guard let items = self.items as? [Item<ContentType>] else {
+            throw ReadError.unexpectedContentType
+        }
+        
+        let typed = TypedSection(
+            identifier: identifier,
+            items: items
+        )
+        
+        try block(typed)
+    }
+    
+    //
     // MARK: Adding & Removing Single Items
     //
     
@@ -138,4 +165,21 @@ public struct Section
         
         return Array(self.items[0..<end])
     }
+}
+
+
+extension Section {
+    
+    public enum ReadError : Error {
+        case incorrectIdentifierType(AnyIdentifier)
+        case unexpectedContentType
+    }
+}
+
+
+public struct TypedSection<IdentifierType:Hashable, ContentType:ItemContent> {
+    
+    public var identifier : IdentifierType
+    public var items : [Item<ContentType>]
+    
 }

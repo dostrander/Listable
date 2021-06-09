@@ -1257,11 +1257,13 @@ extension ListView : ReorderingActionsDelegate
     }
     
     func updateReorderTargetPosition(
-        with recognizer : UIPanGestureRecognizer,
+        with recognizer : Reordering.GestureRecognizer,
         for item : AnyPresentationItemState
     )
     {
-        let position = recognizer.location(in: self.collectionView)
+        guard let position = recognizer.reorderPosition(in: self.collectionView) else {
+            return
+        }
         
         self.collectionView.updateInteractiveMovementTargetPosition(position)
     }

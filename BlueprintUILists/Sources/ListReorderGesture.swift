@@ -43,14 +43,7 @@ public struct ListReorderGesture : Element
     /// If the gesture is enabled or not.
     public var isEnabled : Bool
     
-    typealias OnStart = () -> Bool
-    var onStart : OnStart
-    
-    typealias OnMove = (UIPanGestureRecognizer) -> ()
-    var onMove : OnMove
-    
-    typealias OnDone = () -> ()
-    var onDone : OnDone
+    let actions : ReorderingActions
     
     /// Creates a new re-order gesture which wraps the provided element.
     /// 
@@ -63,9 +56,7 @@ public struct ListReorderGesture : Element
     ) {
         self.isEnabled =  isEnabled
         
-        self.onStart = { actions.beginMoving() }
-        self.onMove = { actions.moved(with: $0) }
-        self.onDone = { actions.end() }
+        self.actions = actions
         
         self.element = element
     }
@@ -88,9 +79,7 @@ public struct ListReorderGesture : Element
             config.apply { view in
                 view.recognizer.isEnabled = self.isEnabled
                 
-                view.recognizer.onStart = self.onStart
-                view.recognizer.onMove = self.onMove
-                view.recognizer.onDone = self.onDone
+                view.recognizer.apply(actions: self.actions)
             }
         }
     }
