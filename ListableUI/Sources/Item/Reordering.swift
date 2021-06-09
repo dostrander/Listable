@@ -22,7 +22,7 @@ public struct Reordering
     public var canReorder : CanReorder?
     
     ///
-    public typealias CanReorder = (ReorderInfo) -> Bool
+    public typealias CanReorder = (Context) -> Bool
     
     // MARK: Responding To Reordering
     
@@ -30,7 +30,7 @@ public struct Reordering
     public var didReorder : DidReorder
     
     ///
-    public typealias DidReorder = (ReorderInfo) -> ()
+    public typealias DidReorder = (Context) -> ()
     
     // MARK: Initialization
     
@@ -67,7 +67,7 @@ extension Reordering {
     ///
     ///
     ///
-    public struct ReorderInfo {
+    public struct Context {
         
         // MARK: Public Properties
         
@@ -212,7 +212,7 @@ extension Reordering {
         toSection : PresentationState.SectionState
     ) -> IndexPath
     {
-        let info = ReorderInfo(
+        let info = Context(
             from: from,
             fromSection: fromSection.model,
             to: to,

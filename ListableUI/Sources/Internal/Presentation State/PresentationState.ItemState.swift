@@ -60,7 +60,7 @@ protocol AnyPresentationItemState : AnyObject
     var isReordering : Bool { get }
     
     /// TODO: Ensure only called when NOT cancelled
-    func reordered(with result : Reordering.ReorderInfo)
+    func reordered(with context : Reordering.Context)
 }
 
 
@@ -496,9 +496,9 @@ extension PresentationState
         
         private(set) var isReordering : Bool = false
         
-        func reordered(with result : Reordering.ReorderInfo)
+        func reordered(with context : Reordering.Context)
         {
-            self.model.reordering?.didReorder(result)
+            self.model.reordering?.didReorder(context)
         }
     }
 }
