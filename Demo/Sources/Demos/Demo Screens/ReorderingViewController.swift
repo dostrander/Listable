@@ -37,7 +37,7 @@ final class ReorderingViewController : UIViewController
                     item.reordering = Reordering { context in
                         print("Moved: \(context.indexPathsDescription)")
                         
-                        try? context.toSection.read(identifier: String.self, content: DemoItem.self) { section in
+                        try? context.toSection.read(as: DemoItem.self, identifier: String.self) { section in
                             print(section)
                         }
                     }

@@ -90,9 +90,9 @@ public struct Section
     //
     
     ///
-    public func read<IdentifierType:Hashable, ContentType:ItemContent>(
+    public func read<ContentType:ItemContent, IdentifierType:Hashable>(
+        as contentType : ContentType.Type,
         identifier identifierType : IdentifierType.Type,
-        content contentType : ContentType.Type,
         using block : (TypedSection<IdentifierType, ContentType>) throws -> ()
     ) throws
     {
